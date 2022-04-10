@@ -7,30 +7,50 @@ Vue based code and routing will go here. Any client sided code will also either 
 
 const client = require('../vue');
 const Router = require('../vue-router');
+const mainPage = require('./client.vue')
+const "404" = require('./components/404.vue')
 
 client.use(Router);
 
-export default new Router({
+const Routes({
     routes: [{
         path: '/',
-        name: 'hello'
+        name: 'hello',
+        component: mainPage
         },
         {
         path: '/test',
-        name: 'test'
+            name: 'test',
+        component: 
         },
         {
         path: '/foo',
         name: 'foo'
+        },
+        {
+            path: '*',
+            component: "404"
         }
     ]
 })
 
+const router = new Router({
+    mode: "history",
+    base: process.env.URL,
+    routes
+});
+
 export default {
     test(values) {
-        return fetch('${ process.env.URL }/register')
+        return fetch('${ process.env.URL }/register', {
+                method: 'POST',
+                body: values
+                })
             .then(response => response.json())
-            .then(data => console.log(data));
+            .then(data => console.log(data)
+            .catch(error => {
+                console.error('Error:', error);
+            }));
     }
 
 }
