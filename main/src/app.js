@@ -11,8 +11,8 @@ require("./data/$$$");
 require('./client/$$$');
 require('./api/$$$');
 require('./config/dotenv').config();
-const express = require('./express');
-const fetch = require('./node-fetch');
+const express = require('express');
+const fetch = require('node-fetch');
 const { MongoClient } = require('mongodb');
 const dbURL = 'mongodb://localhost:27017';
 const dbClient = new MongoClient(dbURL);
@@ -58,11 +58,3 @@ function statProcess(steamID, rustDB, finalDB) {
     final *= 100;
     finalDB.insertOne({ steamID: final });
 }
-
-
-
-
-
-
-dbInit();
-
