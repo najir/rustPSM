@@ -6,70 +6,42 @@
 		<meta http-equiv="X-UA-Compatible" content="ie=edge">
 		<title>Vue rustPSM</title>
 </head>
+
+
+
+
 <body>
 	<div id="app">
+
 		<div id="nav">
 			<router-link to="/">Home</router-link>
-			<router-link to="/test">Test</router-link>
+			<router-link to="/about">Test</router-link>
 		</div>
+
+		<div id="steamEntry">
+			<label for="idEntry">steamID: </label>
+		<input type="text" id="idEntry" name="idEntry" v-model="idEntry" />
+		<button @click="submitEntry"> Submit ID</button>
+		</div>
+
 		<router-view />
 		<p @click="onClick">hello, Test</p>
 	</div>
-	<div id="app2">
-		<p v-show="showText">This is some text on a page.</p>
-		<button @click="showText = !showText">Toggle Text</button>
-	</div>
-	<div id="app3">
-		<label for="test">Test: </label>
-		<input type="text" id="test" name="test" v-model="name" />
-		<p v-show="name != ''"> This is a, {{ name }} </p>
-	</div>
-	<div id="helloApp">
-		<h1>{{ msg }}</h1>
-	</div>
 
-	<script>
-		new Vue({
-			el: '#helloApp',
+	<scripts>
+		clientJS = require('./index.js')
+		var vm = new Vue({
+			el: '#app'
 			data: {
-				msg: 'Hello, Vue!'
+				idEntry: ''
 			}
-		});
-	</script>
-
-	<script>
-		new Vue({
-			el: '#app3',
-			data: {
-				name: ''
-			}
-		});
-	</script>
-	<script>
-		new Vue({
-			el: '#app',
-			mounted() {
-				console.log('component is mounted')
-			}
-		});
-	</script>
-	<script>
-		new Vue({
-			el: '#app',
 			methods: {
-				onClick(x) {
-					console.log(x.currentTarget.innerText)
+				submitEntry: function (event) {
+					clientJS.steamPostData(idEntry)
 				}
 			}
-		});
-	</script>
-	<script>
-		const vm = new Vue({
-			el: '#app2'
-			data: {
-				showText: true
-			}
 		})
-	</script>
+
+	</scripts>
 </body>
 </html>
