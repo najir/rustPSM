@@ -7,32 +7,30 @@ Vue based code and routing will go here. Any client sided code will also either 
 
 const client = require('../vue');
 const Router = require('../vue-router');
-const mainPage = require('./client.vue')
-const "404" = require('./components/404.vue')
+const mainPage = require('./client.vue');
+const missing = require('./components/404.vue');
 
 client.use(Router);
 
-const Routes({
-    routes: [{
+const routes = [
+    {
         path: '/',
         name: 'hello',
         component: mainPage
-        },
-        {
-        path: '/test',
-            name: 'test',
-        component: 
-        },
-        {
+    },
+    {
+        path: '/about',
+        name: 'about',
+    },
+    {
         path: '/foo',
         name: 'foo'
-        },
-        {
-            path: '*',
-            component: "404"
-        }
-    ]
-})
+    },
+    {
+        path: '*',
+        component: missing
+    }
+];
 
 const router = new Router({
     mode: "history",
@@ -40,17 +38,25 @@ const router = new Router({
     routes
 });
 
-export default {
-    test(values) {
+function steamPostData(values) {
+    if (checkSteamId(values)) {
         return fetch('${ process.env.URL }/register', {
-                method: 'POST',
-                body: values
-                })
+            method: 'POST',
+            body: values
+        })
             .then(response => response.json())
             .then(data => console.log(data)
-            .catch(error => {
-                console.error('Error:', error);
-            }));
+                .catch(error => {
+                    console.error('Error:', error);
+                }));
     }
+    else {
+        return "There was an error in your steamID entry"
+    }
+}
+
+function checkSteamId(steamId) {
+
+
 
 }
