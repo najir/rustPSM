@@ -1,28 +1,43 @@
 # rustPSM
-Rust Player Stat Module is a basic Javascript based application that will allow you to pull and modify player information via steam name or ID. This is to be used with a sibling application to post the data client side.
+Rust Player Stat Module is a basic Javascript based application that will take Rust player data and determine their rating in comparison with other players and their stats.
+This is to be used to guage if a player may be cheating. A front end client will allow you to enter steam_id info and browse saved users data.
+
 
 Rust provides some api information via steam player stat api. I create two percentages, one is the percent of shots hit compared to fired and the second is headshots compared to shots hit.
 I've weighted the headshot % higher due to headshots being inconsistent to hit with regards to spray control specific to rust, and the fact that players often shoot randomly or spend
 time training their spray on walls. For this reason, hit % is reduced by a factor of 10 and added on directly to hs% to add weight to those who are unnaturally consistent with their shots.
 
+
 For example:
+
 player 1:
+
 344 hs / 450 shots hit = 76%
+
 450 shots hit/ 12500 shots fired = 0.036 / 10 = .0036
+
 total = 76.36
 
+
 player 2:
+
 344/450 = 76%
+
 450/550 = .81 / 10 = .081
+
 total = 84.1
 
+
 Player 2 is more likely to be a suspect player, and their stats will scale higher due to this
+
 
 I then take all player information and seek to ping the player as suspect if they are above the .003% of all players. This player comparison will be skewed with small data pools, and will be
 improved with more entries.
 
 
+
 Future goals: I may find and use an existing stat base from other sites or similar games to compare stats to. This will have it's own issues and future data will be weighted based on a few variables.
+
 
 
 
