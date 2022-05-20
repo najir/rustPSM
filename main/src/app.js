@@ -6,12 +6,7 @@ rustPSM main application code. This application will pull data from steamAPI and
 VUE based page. Details will be added as code is written...
 */
 
-
-require("./data/$$$");
-require('./client/$$$');
-require('./api/$$$');
 require('./config/dotenv').config();
-const express = require('express');
 const fetch = require('node-fetch');
 const { MongoClient } = require('mongodb');
 const dbURL = 'mongodb://localhost:27017';
@@ -28,6 +23,14 @@ async function dbInit() {
     return 'complete';
 }
 
+/*
+ This function needs rewritten. It should;
+ Take steamId and check rustDB for existing data.
+ If yes, send existing data
+ If no, Send steam ID to new function, pull and sort data to gath specific variables. Create player data accounts and send to rust DB
+ send rustDB data back to api call and the front end should send to a new page using that data.
+ 
+ */
 function steamFetch(appID, steamID, rustDB) {
     fetch('http://api.steampowered.com/ISteamUserStats/GetUserStatsForGame/v0002/?appid=${appID}&key=${proccess.env.steamAPI}&steamid=${steamID}')
         .then((res) => {

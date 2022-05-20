@@ -1,0 +1,25 @@
+<!DOCTPYE html>
+<html lang="en-US">
+    <head>
+        <title>Home</title>
+        <link rel="stylesheet" href="mainstyle.css">
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="description" content="Main html Document">
+        <meta name="Author" content="Isaac Perks">
+        <script src="https://unpkg.com/vue@3.0.4"></script>
+        <script src="https://unpkg.com/vue-router@4"></script>
+        <script src="./vueApp.js" type="module"></script>
+        <link rel="modulepreload" href="./Components/home.js">
+        <link rel="modulepreload" href="./Components/404.js">
+    </head>
+    <body>
+        <div id="app">
+            <p>
+                <router-link to="/about">About</router-link>
+                <router-link to="/">Home</router-link>
+            </p>
+            <router-view></router-view>
+        </div>
+    </body>
+</html>
