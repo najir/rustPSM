@@ -10,21 +10,21 @@ export default {
     methods: {
         submit(handler) {
             let self = this
-            if(this.steamIdCheck(id)){
-                fetch(this.$router.base + "/" + id)
+            if(this.steamIdCheck(this.id)){
+               // fetch(this.$router.base + "/" + this.id)
+                 //   .then(response => {})
+                   // .catch(error => {})
             }
             else {
                 this.errors.steamId = "The steamId value you entered is not valid, please try again."
             }
         },
         steamIdCheck(idValue) {
-            let finalId = idValue
-            if () {
-
-            }
-            else {
-
-            }
+            //let finalId = idValue
+            //if () {
+            //}
+            //else {
+            //}
             return false
         }
     },
@@ -36,8 +36,8 @@ export default {
             We will provide a built-in statistic for comparing users based on several ingame stats. More involved information <br />
             Can be found on the project github page:</p>
         <a href="https://www.github.com">GitHub Link</a>
-        <form method="POST" class="form-horizontal" onSubmit="return false;" @submit.prevent="submit" v-on:submit="submit($event);">
-            <input type="text" v-model="name">
+        <form class="form-horizontal" v-on:submit.prevent="submit($event);">
+            <input type="text" v-model="id">
             <button type="submit">
                 Send SteamID
             </button>

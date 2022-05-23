@@ -9,8 +9,9 @@ Vue based code and routing will go here. Any client sided code will also either 
 */
 
 //const Router = require('vue-router');
-const mainPage = require('../Components/home.js');
-const missing = require('../components/404.js');
+//import VueRouter from 'vue-router'
+import mainPage from '/static/home.js'
+import missing from '/static/404.js'
 
 const routes = [
     {
@@ -27,16 +28,17 @@ const routes = [
         name: 'foo'
     },
     {
-        path: '*',
+        path: '/:pathmatch(.*)*',
+        name: 'not-found',
         component: missing
     }
 ];
 
-const router = VueRouter.create({
-    mode: "history",
-    base: process.env.URL+':'+process.env.PORT,
-    routes
-});
+//const router = new VueRouter({
+//    mode: "history",
+    //base: process.env.URL+':'+process.env.PORT,
+//    routes
+//});
 
 
-export default router
+export default routes
