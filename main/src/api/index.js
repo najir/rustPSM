@@ -17,46 +17,45 @@ server.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'client', 'mainpage.html'))
 })
 
-server.get('/api/test', (req, res) => {
+//Calls the same as db request. App will check if exists, update/create data and respond with json values needed for whoever made the call.
+server.get('/api/:id', (req, res) => {
+    let response = appClient.dbRead(req.params.id);
     res.send({
-        message:'hello'
+        response
     })
+
 })
 
-server.post('/api/register', (req, res) => {
-    res.send({
-        message:'test'
-    })
-})
-
-server.get('/api/user/:id', (req, res) => {
-    res.json(appClient.steamFetch(req.params.id));
-})
-
+//Database calls, currently unused but may be accessed for making admin changes to db on client side via url calls
 server.get('/database/read/:id', (req, res) => {
+    let response = appClient.dbRead(req.params.id);
     res.send({
-
+        response
     })
 
 })
 
 server.put('/database/create/:id', (req, res) => {
+    let response = appClient.dbCreate(req.params.id);
     res.send({
-
+        response
     })
 
 })
 
 server.post('/database/update/:id', (req, res) => {
+    let response = appClient.dbUpdate(req.params.id);
     res.send({
-
+        response
     })
 })
 
 server.get('/database/delete/:id', (req, res) => {
+    let response = appClient.dbDelete(req.params.id);
     res.send({
-
+        response
     })
 })
 
 server.listen(process.env.PORT || 8081)
+appClient.dbInit()

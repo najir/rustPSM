@@ -6,58 +6,137 @@ rustPSM main application code. This application will pull data from steamAPI and
 VUE based page. Details will be added as code is written...
 */
 
-require('./config/dotenv').config();
-const fetch = require('node-fetch');
+require('dotenv').config();
+const https = require('https');
 const { MongoClient } = require('mongodb');
-const dbURL = 'mongodb://localhost:27017';
+const dbURL = process.env.dbURI;
 const dbClient = new MongoClient(dbURL);
-const dbName = 'rustPSMdb';
 
-async function dbInit() {
-    await dbClient.connect();
-    console.log('Client connected');
-    const db = dbClient.db(dbName);
-    const rustStats = db.collection('rustStats');
-    const finalStats = db.collection('finalStats');
-    finalStats.createIndex({ index: 1 });
-    return 'complete';
+async function dbO() {
+    try {
+        await dbClient.connect();
+        console.log('Client connected');
+    }
 }
 
-/*
- This function needs rewritten. It should;
- Take steamId and check rustDB for existing data.
- If yes, send existing data
- If no, Send steam ID to new function, pull and sort data to gath specific variables. Create player data accounts and send to rust DB
- send rustDB data back to api call and the front end should send to a new page using that data.
- 
- */
-function steamFetch(appID, steamID, rustDB) {
-    fetch('http://api.steampowered.com/ISteamUserStats/GetUserStatsForGame/v0002/?appid=${appID}&key=${proccess.env.steamAPI}&steamid=${steamID}')
+//Uses get request to grab json data from steam api call. Returns data to caller
+function steamFetch(steamID) {
+    https.get('http://api.steampowered.com/ISteamUserStats/GetUserStatsForGame/v0002/?appid=${process.env.appID}&key=${proccess.env.steamAPI}&steamid=${steamID}')
         .then((res) => {
             if (res.ok) {
                 return res.json();
             }
             else { throw err }
         })
-        .then((json) => {
-            let doc = json;
-            rustDB.insertOne(doc);
-            //send to db? Need to see data format for rust to then parse
-            console.log("inserted document into mongo; ${doc}");
-        })
 
 }
 
+//Function calls steamFetch, sorts and parses JSON, gathers needed data, calls db functions and returns true or err when complete
 function statProcess(steamID, rustDB, finalDB) {
-    let kills = parseInt(rustDB.distinct("kill_player", { "steamID": steamID }));
-    let fired = parseInt(rustDB.distinct("bullet_fired", { "steamID": steamID }));
-    let hits = parseInt(rustDB.distinct("bullet_hit_player", { "steamID": steamID }));
-    let headshots = parseInt(rustDB.distinct("headshot", { "steamID": steamID }));
+    let response = err;
+    let data = steamFetch(steamID);
+    let finalObject = {};
+    if (data) {
+        //process data and set it to final object
+        //jsonify object and make dbcreate calls. This will create or update the db and end. This will allow dbread to finish
+        response = dbCreate(finalObject.json);
+        let parsedRes = JSON.parse(repsonse);
+        let headshot = parsedRes.headshot / parsedRes.bullet_hit_player
+        let kd = parsedRes.kill_player / parsedRes.deaths
+        let hitshot = parsedRes.bullet_hit_player / parsedRes.bullet_fired
+        let rating = (headshot*10) + (kd*1.5) + (hitshot*5)
+        finalObject.append(steamID)
+        finalObject.append(headshot)
+        finalObject.append(kd)
+        finalObject.append(hitshot)
+        finalObject.append(rating)
+        self.dbCreate(finalObject)
+    }
+    return response;
+}
 
-    let hs = headshots / hits;
-    hs /= 10
-    let accuracy = hits / fired;
-    let final = hs + accuracy;
-    final *= 100;
-    finalDB.insertOne({ steamID: final });
+//Data base calls, need to actually find out what order to enter these is....
+
+//calling function should account for returned errors, data needs to be searchable value in db
+async function dbRead(data) {
+    let finalResult = err
+    try {
+        await dbClient.connect();
+        console.log('Client connected');
+        let collection = dbClient.collections('userData');
+        if (data.length == 17 && data.isInteger()) {
+            if (statProcess(data)) {
+                //access db and return the data found after statprocess is done
+                //set finalResult = to the data found in db as a json object
+                finalResult = await collection.findOne(data)
+            }
+        }
+    } finally {
+        await dbClient.close();
+        return finalResult;
+    }
+}
+
+async function dbCreate(data) {
+    let finalResult = err
+    try {
+        await dbClient.connect();
+        console.log('client connnected');
+        let collection = dbClient.collections('userData');
+        if (data) {
+            let dataExists = colllection.findOne(data.steamID)
+            if (dataExists) {
+                collection.updateOne(data.steamID, data);
+                finalResult = true;
+            }
+            else {
+                collection.insertOne(data);
+                finalResult = true;
+                //add to db
+            }
+        }
+    } finally {
+        await dbClient.close();
+        return finalResult;
+    }
+}
+
+async function dbUpdate(data) {
+    let finalResult = err
+    try {
+        await dbClient.connect();
+        console.log('client connected');
+        let collection = dbClient.collections('userData');
+        if (data) {
+            let dataExists = collection.findOne(data.steamID)
+            if (dataExists) {
+                //Requires full data, will run update in db to post new information
+                collection.updateOne(data.steamID, data);
+                finalResult = true
+            }
+        }
+    } finally {
+        await dbClient.close();
+        return finalResult;
+    }
+}
+
+async function dbDelete(data) {
+    finalResult = err
+    try {
+        await dbClient.connect();
+        console.log('client connected');
+        let collection = dbClient.collections('userData');
+        if (data.length == 17 && data.isInteger()) {
+            let dataExists = collection.findOne(data)
+            if (dataExists) {
+                collection.deleteOne(data)
+                //db delete
+                finalResult = true
+            }
+        }
+    } finally {
+        await dbClient.close();
+        return finalResult;
+    }
 }

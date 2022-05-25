@@ -11,21 +11,21 @@ export default {
         submit(handler) {
             let self = this
             if(this.steamIdCheck(this.id)){
-               // fetch(this.$router.base + "/" + this.id)
-                 //   .then(response => {})
-                   // .catch(error => {})
+                fetch(this.window.locaton.href + "/api/" + this.id, 'GET')
+                    .then(response => {})
+                    .catch(error => {})
             }
             else {
                 this.errors.steamId = "The steamId value you entered is not valid, please try again."
             }
         },
         steamIdCheck(idValue) {
-            //let finalId = idValue
-            //if () {
-            //}
-            //else {
-            //}
-            return false
+            let finalId = idValue
+            let result = false
+            if (idValue.length == 17) {
+                result = true
+            }
+            return result;
         }
     },
     template: `

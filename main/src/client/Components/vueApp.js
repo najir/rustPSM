@@ -13,7 +13,7 @@ window.addEventListener("load", function () {
     const router = VueRouter.createRouter({
         mode: "history",
         history: VueRouter.createWebHistory(),
-        //base: process.env.URL+':'+process.env.PORT,
+        base: '/',
         routes
     });
     app.use(router);
