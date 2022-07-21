@@ -9,109 +9,125 @@ VUE based page. Details will be added as code is written...
 require('dotenv').config();
 const https = require('https');
 const { MongoClient } = require('mongodb');
-const dbURL = process.env.dbURI;
+const dbURL = "mongodb+srv://najir:Iperks101@cluster0.ss2te.mongodb.net/?retryWrites=true&w=majority" //running this through config.env was causing errors, temp usage via direct input
 const dbClient = new MongoClient(dbURL);
 
-async function dbO() {
-    try {
-        await dbClient.connect();
-        console.log('Client connected');
-    }
-}
 
-//Uses get request to grab json data from steam api call. Returns data to caller
 function steamFetch(steamID) {
-    https.get('http://api.steampowered.com/ISteamUserStats/GetUserStatsForGame/v0002/?appid=${process.env.appID}&key=${proccess.env.steamAPI}&steamid=${steamID}')
-        .then((res) => {
-            if (res.ok) {
-                return res.json();
-            }
-            else { throw err }
-        })
+    console.log('testing2')
+    let finalData = {}
+    return new Promise((resolve, reject) => {
+        console.log('testing3')
+        https.get({
+            hostname: `api.steampowered.com`,
+            path: `/ISteamUserStats/GetUserStatsForGame/v0002/?appid=252490&key=D23B60AFE19580CBC774B89844D59144&steamid=${steamID}`,
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' }
+        }, (res) => {
+            console.log(`statusCode: ${res.statusCode}`);
 
+            res.on('data', d => {
+                finalData = d;
+                console.log(JSON.parse(d).playerstats.stats.find(function (e) { return e.name == 'headshot' }).value)
+                resolve(finalData)
+            }).on('error', error => {
+                console.error(error);
+                reject(error);
+            });
+        });
+    });
 }
 
-//Function calls steamFetch, sorts and parses JSON, gathers needed data, calls db functions and returns true or err when complete
-function statProcess(steamID, rustDB, finalDB) {
-    let response = err;
-    let data = steamFetch(steamID);
-    let finalObject = {};
-    if (data) {
-        //process data and set it to final object
-        //jsonify object and make dbcreate calls. This will create or update the db and end. This will allow dbread to finish
-        response = dbCreate(finalObject.json);
-        let parsedRes = JSON.parse(repsonse);
-        let headshot = parsedRes.headshot / parsedRes.bullet_hit_player
-        let kd = parsedRes.kill_player / parsedRes.deaths
-        let hitshot = parsedRes.bullet_hit_player / parsedRes.bullet_fired
-        let rating = (headshot*10) + (kd*1.5) + (hitshot*5)
-        finalObject.append(steamID)
-        finalObject.append(headshot)
-        finalObject.append(kd)
-        finalObject.append(hitshot)
-        finalObject.append(rating)
-        self.dbCreate(finalObject)
-    }
+
+async function statProcess(steamID) {
+    let response = [];
+    await steamFetch(steamID).then((data) => {
+        let finalObject = [];
+        console.log('stat process called')
+        if(data) {
+            console.log(data)
+            let parsedRes = JSON.parse(data).playerstats.stats;
+            let headshot = parsedRes.find(function (e) { return e.name == 'headshot' }).value / parsedRes.find(function (e) { return e.name == 'bullet_hit_player' }).value
+            let kd = parsedRes.find(function (e) { return e.name == 'kill_player' }).value / parsedRes.find(function (e) { return e.name == 'deaths' }).value
+            let hitshot = parsedRes.find(function (e) { return e.name == 'bullet_hit_player' }).value / parsedRes.find(function (e) { return e.name == 'bullet_fired' }).value
+            let rating = (headshot * 10) + (kd * 1.5) + (hitshot * 5)
+            console.log('parsed')
+            response.push({
+                '_id': steamID, 'name': steamID, 'headshot': headshot, 'kd': kd, 'hitshot': hitshot, 'rating': rating
+            })
+            console.log('creating')
+ 
+        }
+    });
+    await dbCreate(response)
     return response;
 }
 
-//Data base calls, need to actually find out what order to enter these is....
-
-//calling function should account for returned errors, data needs to be searchable value in db
+//calling function should account for returned errors, data needs to be searchable value in db(should be steamID)
 async function dbRead(data) {
-    let finalResult = err
+    let finalResult = {}
+    let stringData = data.toString();
     try {
-        await dbClient.connect();
-        console.log('Client connected');
-        let collection = dbClient.collections('userData');
-        if (data.length == 17 && data.isInteger()) {
-            if (statProcess(data)) {
-                //access db and return the data found after statprocess is done
-                //set finalResult = to the data found in db as a json object
-                finalResult = await collection.findOne(data)
-            }
+        if (data.length == 17) {
+            await statProcess(data).then((fetchData) => {
+                if (fetchData) {
+                    console.log('testing1')
+                }
+            })
+            await dbClient.connect();
+            console.log('Client connected');
+            let collection = dbClient.db('rustPSM').collection('userData');
+            console.log('find one requested: ' + stringData)
+            finalResult = await collection.findOne({ _id: stringData })
         }
-    } finally {
-        await dbClient.close();
-        return finalResult;
+    } finally { return finalResult;}
+}
+
+async function createHelper(data) {
+    console.log(data[0])
+    let collection = dbClient.db('rustPSM').collection('userData');
+    if (data) {
+        let dataExists = await collection.findOne(data.name)
+        console.log(dataExists)
+        if (dataExists) {//this mostly likely will not process the way i want it too
+            await collection.updateOne({ name: data[0].name }, { $set : data[0] });
+            console.log('Updated one')
+            finalResult = true;
+        }
+        else {
+            await collection.insertOne(data[0]);
+            console.log('inserted one')
+            finalResult = true;
+        }
     }
 }
 
 async function dbCreate(data) {
-    let finalResult = err
+    let finalResult = false
     try {
         await dbClient.connect();
         console.log('client connnected');
-        let collection = dbClient.collections('userData');
-        if (data) {
-            let dataExists = colllection.findOne(data.steamID)
-            if (dataExists) {
-                collection.updateOne(data.steamID, data);
-                finalResult = true;
-            }
-            else {
-                collection.insertOne(data);
-                finalResult = true;
-                //add to db
-            }
-        }
-    } finally {
+        await createHelper(data);
+        console.log('client closed')
         await dbClient.close();
         return finalResult;
+    } finally {
+       // console.log('client closed')
+       // await dbClient.close();
+     //   return finalResult;
     }
 }
 
 async function dbUpdate(data) {
-    let finalResult = err
+    let finalResult = false
     try {
         await dbClient.connect();
         console.log('client connected');
-        let collection = dbClient.collections('userData');
+        let collection = dbClient.db('rustPSM').collection('userData');
         if (data) {
-            let dataExists = collection.findOne(data.steamID)
-            if (dataExists) {
-                //Requires full data, will run update in db to post new information
-                collection.updateOne(data.steamID, data);
+            let dataExists = collection.findOne(data.name)
+            if (dataExists) { // most likely needs changed
+                collection.updateOne(data.name, data);
                 finalResult = true
             }
         }
@@ -122,16 +138,15 @@ async function dbUpdate(data) {
 }
 
 async function dbDelete(data) {
-    finalResult = err
+    finalResult = false
     try {
         await dbClient.connect();
         console.log('client connected');
-        let collection = dbClient.collections('userData');
+        let collection = dbClient.db('rustPSM').collection('userData');
         if (data.length == 17 && data.isInteger()) {
             let dataExists = collection.findOne(data)
-            if (dataExists) {
+            if (dataExists) {//most likely needs changed
                 collection.deleteOne(data)
-                //db delete
                 finalResult = true
             }
         }
@@ -140,3 +155,5 @@ async function dbDelete(data) {
         return finalResult;
     }
 }
+
+module.exports = {dbCreate, dbDelete, dbRead, dbUpdate}

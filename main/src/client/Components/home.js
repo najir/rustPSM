@@ -10,13 +10,11 @@ export default {
     methods: {
         submit(handler) {
             let self = this
-            if(this.steamIdCheck(this.id)){
-                fetch(this.window.locaton.href + "/api/" + this.id, 'GET')
-                    .then(response => {})
-                    .catch(error => {})
+            if(self.steamIdCheck(self.id)){
+                self.$router.push(`/user/${self.id}`)
             }
             else {
-                this.errors.steamId = "The steamId value you entered is not valid, please try again."
+                self.errors.steamId = "The steamId value you entered is not valid, please try again."
             }
         },
         steamIdCheck(idValue) {

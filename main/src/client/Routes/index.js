@@ -12,6 +12,8 @@ Vue based code and routing will go here. Any client sided code will also either 
 //import VueRouter from 'vue-router'
 import mainPage from '/static/home.js'
 import missing from '/static/404.js'
+import userPage from '/static/userPage.js'
+
 
 const routes = [
     {
@@ -24,8 +26,10 @@ const routes = [
         name: 'about',
     },
     {
-        path: '/foo',
-        name: 'foo'
+        path: '/user/:id',
+        name: 'userPage',
+        component: userPage,
+        props: true
     },
     {
         path: '/:pathmatch(.*)*',
@@ -33,12 +37,5 @@ const routes = [
         component: missing
     }
 ];
-
-//const router = new VueRouter({
-//    mode: "history",
-    //base: process.env.URL+':'+process.env.PORT,
-//    routes
-//});
-
 
 export default routes
