@@ -1,0 +1,63 @@
+﻿body {
+    background-color: coral
+}
+h1 {
+
+}
+p {
+
+}
+table {
+    width: 100%;
+    height: 30%;
+
+    background-color: tomato;
+}
+td, th{
+    text-align: center;
+    vertical-align: middle;
+}
+th {
+    border-bottom: 1px solid #ddd;
+}
+td:hover {
+    background-color: coral;
+}
+p.navi {
+    color: black;
+    background-color: tomato;
+    text-align: left;
+
+    border-style: outset;
+    border-width: 2px;
+    border-color: black;
+
+    margin-bottom: 100px;
+
+    height: 50px;
+    width: 100%;
+}
+input[type=text] {
+    text-align: center;
+    padding: 4px;
+    width: 50%;
+    align-content: center;
+    
+}
+.FWButton{
+    border: double;
+    padding: 8px;
+    margin-top: 8px;
+    background-color: tomato;
+    cursor: pointer;
+    width: 50%;
+    text-align: center; 
+}
+.spacealign{
+    margin: 16px;
+    align-content: center;
+    text-align: center;
+    background-color: lightsteelblue;
+    border: double;
+    padding: 12px;
+}

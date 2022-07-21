@@ -1,4 +1,4 @@
-export default {
+    export default {
     data() {
         return {
             id: '',
@@ -27,16 +27,14 @@ export default {
         }
     },
     template: `
-        <h1>Welcome to RustPSM</h1>
+        <h1>RustPSM</h1>
         <h2>Isaac Perks</h2>
-        <h3>05/18/22</h3>
-        <p>Here you will be able to enter the steamID of a player to gather their stats and compare them to our database. <br />
-            We will provide a built-in statistic for comparing users based on several ingame stats. More involved information <br />
-            Can be found on the project github page:</p>
-        <a href="https://www.github.com">GitHub Link</a>
+        <h3>07/21/22</h3>
+        <p class="spacealign">Enter your SteamID and submit to be sent to your personal statistics page.</p>
         <form class="form-horizontal" v-on:submit.prevent="submit($event);">
             <input type="text" v-model="id">
-            <button type="submit">
+            <br />
+            <button class="FWButton" type="submit">
                 Send SteamID
             </button>
             <p class="error" v-if="errors.steamId">{{errors.steamId}}</p>

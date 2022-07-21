@@ -18,7 +18,7 @@ export default {
             .catch(error => { console.log(error) })
     },
     template: `
-        <h1>Player data Stats.</h1>
+        <h1>Player data Stats</h1>
         <h1>Steam ID: {{this.id}}</h1>
         <table>
             <tr>

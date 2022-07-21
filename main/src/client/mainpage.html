@@ -12,12 +12,13 @@
     <script type="module" src="/static/vueApp.js"></script>
     <link rel="modulepreload" href="/static/home.js">
     <link rel="modulepreload" href="/static/404.js">
+    <link rel="stylesheet" type="text/css" href="/static/StyleSheetMain.css" media="screen">
 </head>
 <body>
     <div id="app">
-        <p>
-            <router-link to="/about">About</router-link>
-            <router-link to="/">Home</router-link>
+        <p class="navi">
+            <router-link to="/about" style="padding-right: 20%;">About</router-link>
+            <router-link to="/" style="padding-right: 20%;">Home</router-link>
         </p>
         <router-view></router-view>
     </div>

@@ -13,6 +13,7 @@ Vue based code and routing will go here. Any client sided code will also either 
 import mainPage from '/static/home.js'
 import missing from '/static/404.js'
 import userPage from '/static/userPage.js'
+import aboutPage from '/static/aboutPage.js'
 
 
 const routes = [
@@ -24,6 +25,7 @@ const routes = [
     {
         path: '/about',
         name: 'about',
+        component: aboutPage
     },
     {
         path: '/user/:id',
